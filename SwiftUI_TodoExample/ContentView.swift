@@ -53,7 +53,7 @@ struct ContentView: View {
                             
                             Text(todo.title)
                         }
-                    }
+                    }.onDelete(perform: delete) // UI上で削除するとself.delete(at offsets: IndexSet)が呼び出されるようになります。
                 }
             }
             .listStyle(GroupedListStyle()) // リストのアイテムをグループ化して表示します。
@@ -66,6 +66,9 @@ struct ContentView: View {
         newTodo = "" // テキストフィールドをクリアします。
     }
     
+    func delete(at offsets: IndexSet){
+        self.todos.remove(atOffsets: offsets) // 配列から要素を削除します
+    }
 
 }
 
