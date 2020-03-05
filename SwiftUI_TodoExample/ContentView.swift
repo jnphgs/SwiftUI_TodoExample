@@ -53,10 +53,13 @@ struct ContentView: View {
                             
                             Text(todo.title)
                         }
-                    }.onDelete(perform: delete) // UI上で削除するとself.delete(at offsets: IndexSet)が呼び出されるようになります。
+                    }
+                    .onDelete(perform: delete) // UI上で削除するとself.delete(at offsets: IndexSet)が呼び出されるようになります。
+                    .onMove(perform: move) // UI上で並べ替えするとself.move(from source: IndexSet, to destination: Int)がよびだされるようになります
                 }
             }
             .listStyle(GroupedListStyle()) // リストのアイテムをグループ化して表示します。
+            .navigationBarItems(trailing: EditButton()) //　並べ替えのためにEditButtonを表示します。
             .navigationBarTitle("Todos")
         }
     }
@@ -68,6 +71,10 @@ struct ContentView: View {
     
     func delete(at offsets: IndexSet){
         self.todos.remove(atOffsets: offsets) // 配列から要素を削除します
+    }
+    
+    func move(from source: IndexSet, to destination: Int){
+        self.todos.move(fromOffsets: source, toOffset: destination) // 配列の要素を並べ替えます
     }
 
 }
