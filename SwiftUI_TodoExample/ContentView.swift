@@ -51,8 +51,6 @@ struct ContentView: View {
                 }
             }
             .navigationBarTitle("Todos")
-            .navigationBarItems(trailing: EditButton())
-            .listStyle(GroupedListStyle())
         }
     }
 }
