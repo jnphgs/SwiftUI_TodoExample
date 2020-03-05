@@ -8,21 +8,10 @@
 
 import SwiftUI
 
-struct Todo: Identifiable {
-    var id = UUID() // IdentifiableプロトコルはIDを持つ必要があります
-    var title: String
-    var completed: Bool
-}
-
-var testData: [Todo] = [
-    Todo( title: "Do Something 1", completed: false),
-    Todo( title: "Do Something 2", completed: false)
-]
-
 struct ContentView: View {
-    // プロパティはViewから変更することができません。
-    // @StateをつけることでView内で変更した値を保持し、変更を通知することで依存するビューを更新できます。
-    @State var todos: [Todo] = testData
+    // View自体は表示とUI処理に専念させるためTodoのリストは ObserbableObject に準拠した TodoStore として
+    // TodoStore.swift 内に定義します
+    @EnvironmentObject var store: TodoStore
     @State private var newTodo: String = "" // 新しく追加するTodoのテキストを保持します
     
     var body: some View {
@@ -34,7 +23,7 @@ struct ContentView: View {
                 }
                 
                 Section{ // Sectionでリストのアイテムをグループ化してます
-                    ForEach(todos){ todo in
+                    ForEach(store.todos){ todo in
                         // Todo要素です。子Viewにしてもいいかもしれません。
                         HStack {
                             // Todoの左にあるチェックボックスはイメージで表示しています。
@@ -43,11 +32,11 @@ struct ContentView: View {
                                 .onTapGesture {
                                     // 配列からidが一致するもののインデックスを取得します。
                                     // 要素にアクセスするのにもっといい方法がありそうだけどとりあえず愚直に全要素比較します。
-                                    let id = self.todos.firstIndex { (t) -> Bool in
+                                    let id = self.store.todos.firstIndex { (t) -> Bool in
                                         return t.id == todo.id
                                     }
                                     // toggle()はSwiftのBoolの標準的な機能で論理反転します
-                                    self.todos[id!].completed.toggle()
+                                    self.store.todos[id!].completed.toggle()
                                     
                                 }
                             
@@ -65,22 +54,22 @@ struct ContentView: View {
     }
 
     func addTodo(){
-        self.todos.append(Todo(title: newTodo, completed: false)) // 配列に新しい要素を追加します
+        self.store.todos.append(Todo(title: newTodo, completed: false)) // 配列に新しい要素を追加します
         newTodo = "" // テキストフィールドをクリアします。
     }
     
     func delete(at offsets: IndexSet){
-        self.todos.remove(atOffsets: offsets) // 配列から要素を削除します
+        self.store.todos.remove(atOffsets: offsets) // 配列から要素を削除します
     }
     
     func move(from source: IndexSet, to destination: Int){
-        self.todos.move(fromOffsets: source, toOffset: destination) // 配列の要素を並べ替えます
+        self.store.todos.move(fromOffsets: source, toOffset: destination) // 配列の要素を並べ替えます
     }
 
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView().environmentObject(TodoStore())
     }
 }
